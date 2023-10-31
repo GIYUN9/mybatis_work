@@ -12,16 +12,16 @@ import com.kh.mybatis.member.model.service.MemberServiceImpl;
 import com.kh.mybatis.member.model.vo.Member;
 
 /**
- * Servlet implementation class MemberInsertController
+ * Servlet implementation class LoginController
  */
-@WebServlet("/insert.me")
-public class MemberInsertController extends HttpServlet {
+@WebServlet("/login.me")
+public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public MemberInsertController() {
+    public LoginController() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,33 +32,21 @@ public class MemberInsertController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		request.setCharacterEncoding("UTF-8");
+//		String userId = request.getParameter("userId");
+//		String userPwd = request.getParameter("userPwd");
 		
-		String userId = request.getParameter("userId");
-		String userPwd = request.getParameter("userPwd");
-		String userName = request.getParameter("userName");
-		String email = request.getParameter("email");
-		String birthday = request.getParameter("birthday");
-		String gender = request.getParameter("gender");
-		String phone = request.getParameter("phone");
-		String address = request.getParameter("address");
+		Member m = new Member();
+		m.setUserId(request.getParameter("userId"));
+		m.setUserPwd(request.getParameter("userPwd"));
 		
-		Member m = new Member(userId,
-								userPwd,
-								userName,
-								email,
-								birthday,
-								gender,
-								phone,
-								address
-								);
+		Member loginUser = new MemberServiceImpl().loginMember(m);
 		
-		int result = new MemberServiceImpl().insertMember(m);
-		
-		if(result > 0) {
-			response.sendRedirect(request.getContextPath());
-		} else {
-			request.setAttribute("errorMsg", "회원가입 실패");
+		if(loginUser == null) {
+			request.setAttribute("errorMsg", "로그인 실패");
 			request.getRequestDispatcher("WEB-INF/views/common/errorPage.jsp").forward(request, response);
+		} else {
+			request.getSession().setAttribute("loginUser", loginUser);
+			response.sendRedirect(request.getContextPath());
 		}
 	}
 
